@@ -1,11 +1,28 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'reddit.dart';
-import 'authHandler/auth_handler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+/// reddit api lib
+import 'reddit.dart';
+
+/// components
+import 'screens/profile/auth_handler.dart';
+import 'screens/feed/feed_view.dart';
+import 'screens/feed/feed_state.dart';
+
 void main() async {
-  await dotenv.load();
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    if (kReleaseMode) exit(1);
+  };
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (err) {
+    print(err);
+    rethrow;
+  }
   runApp(Bluejay());
 }
 
@@ -22,7 +39,10 @@ class Bluejay extends StatelessWidget {
           brightness: theme,
           colorSchemeSeed: Colors.deepPurple,
         ),
-        home: MainLayout());
+        home: MultiProvider(providers: [
+          ChangeNotifierProvider<FeedState>(create: (_) => FeedState()),
+          ChangeNotifierProvider<AppState>(create: (_) => AppState()),
+        ], child: MainLayout()));
     // return ChangeNotifierProvider(
     //   create: (context) => MyAppState(),
     //   child: MaterialApp(
@@ -59,109 +79,55 @@ class MainLayoutState extends State<MainLayout> {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    print(theme);
-    return ChangeNotifierProvider(
-      create: (context) => FeedState(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("BlueJay"),
-          elevation: 2,
-        ),
-        body: _views.elementAt(viewIndex),
-        bottomNavigationBar: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.table_rows_rounded), label: 'Feed'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.search_rounded), label: 'Search'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.person_2_rounded), label: 'Profile')
-          ],
-          onTap: _onViewChange,
-          currentIndex: viewIndex,
-        ),
-        // TODO: add button
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () => setState(() {
-        //     _count++;
-        //   }),
-        //   tooltip: 'Increment Counter',
-        //   child: const Icon(Icons.add),
-        // ),
-        // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked
-      ),
-    );
-  }
-}
-
-class RedditFeedWidget extends StatefulWidget {
-  @override
-  RedditFeedWidgetState createState() => RedditFeedWidgetState();
-}
-
-class RedditFeedWidgetState extends State<RedditFeedWidget> {
-  @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      var feedState = Provider.of<FeedState>(context, listen: false);
-      if (feedState.data.isEmpty) {
-        feedState.fetchBest();
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var appState = Provider.of<AppState>(context, listen: false);
+      await appState.getAuthState();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var feedState = context.watch<FeedState>();
-    print(feedState.data.length);
-    return Center(
-      child: Stack(children: [
-        RefreshIndicator(
-          onRefresh: feedState.fetchBest,
-          child: ListView.builder(
-              itemCount: feedState.data.length,
-              itemBuilder: (context, index) {
-                var entry = feedState.data[index];
-                return Text(entry['data']['title']);
-              }),
-        ),
-        if (feedState.isLoading) Center(child: CircularProgressIndicator()),
-      ]),
+    var appState = context.watch<AppState>();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("BlueJay"),
+        elevation: 2,
+      ),
+      body: _views.elementAt(viewIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.table_rows_rounded), label: 'Feed'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.search_rounded), label: 'Search'),
+          BottomNavigationBarItem(
+              icon: Icon(appState.isAuth ? Icons.person : Icons.login),
+              label: appState.isAuth ? 'Profile' : 'Log In')
+        ],
+        onTap: _onViewChange,
+        currentIndex: viewIndex,
+      ),
+      // TODO: add button
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => setState(() {
+      //     _count++;
+      //   }),
+      //   tooltip: 'Increment Counter',
+      //   child: const Icon(Icons.add),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked
     );
   }
 }
 
-class FeedState extends ChangeNotifier {
-  dynamic data = [];
+class AppState extends ChangeNotifier {
   final RedditAPI _api = redditApi;
-  bool isLoading = false;
+  bool isAuth = false;
 
-  Future<void> fetchBest() async {
-    final rData = await _api.getHot(30, 0);
-    data = rData['data']['children'];
+  Future<void> getAuthState() async {
+    isAuth = await _api.checkAuth();
     notifyListeners();
-  }
-
-  void setLoading(bool loading) {
-    isLoading = loading;
-    notifyListeners();
-  }
-
-  void getAuth() {
-    _api.startAuth();
-  }
-}
-
-class ProfileWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var feedState = context.watch<FeedState>();
-    return Center(
-      child:
-          ElevatedButton(onPressed: feedState.getAuth, child: Text('Log In')),
-    );
   }
 }
