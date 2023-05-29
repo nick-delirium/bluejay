@@ -1,4 +1,29 @@
+import 'package:bluejay/utils/strings.dart';
+
 enum FlairTypes { richtext, text, unmapped }
+
+enum PostType {
+  /// 'self' or null value, go figure
+  text,
+  image,
+  link,
+
+  /// 'hosted:video'
+  video,
+}
+
+PostType mapPostType(String? value) {
+  switch (value) {
+    case 'image':
+      return PostType.image;
+    case 'hosted:video':
+      return PostType.video;
+    case 'link':
+      return PostType.link;
+    default:
+      return PostType.text;
+  }
+}
 
 FlairTypes mapFlairType(String value) {
   switch (value) {
@@ -14,16 +39,26 @@ FlairTypes mapFlairType(String value) {
 
 class Post {
   String subreddit;
+  String subredditId;
   String title;
   String author;
   int score;
   double upvoteRatio;
   bool clicked;
   bool over18;
-  bool isVideo;
   bool hideScore;
   bool spoiler;
   int createdAt;
+  String url;
+  PostType postType;
+  bool isVideo;
+  String? thumbnail;
+
+  /// !!! can be empty
+  String? selftext;
+
+  /// if its image gallery
+  bool? isGallery;
 
   /// flair on post
   FlairTypes linkFlairType;
@@ -33,6 +68,7 @@ class Post {
   Post({
     required this.clicked,
     required this.subreddit,
+    required this.subredditId,
     required this.title,
     required this.score,
     required this.upvoteRatio,
@@ -43,15 +79,37 @@ class Post {
     required this.spoiler,
     required this.linkFlairType,
     required this.createdAt,
+    required this.url,
+    required this.postType,
+    this.selftext,
     this.linkFlairText,
     this.linkFlairBackgroundColor,
+    this.thumbnail,
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
+    String? selfText;
+    String? selfHtml = json['selftext_html'];
+
+    /// thanks for your own markdown implementation reddit
+    /// but I'm good
+    if (selfHtml != '' && selfHtml != null) {
+      selfText = unescapeHtml(selfHtml);
+    }
+
+    /// yeah idk either
+    String? thumbnailLink =
+        json['thumbnail'] != null ? safeThumbnail(json['thumbnail']) : null;
+
     return Post(
       /// can use subreddit instead to get just the name
       subreddit: json['subreddit_name_prefixed'],
+      subredditId: json['subreddit_id'],
       title: json['title'],
+      selftext: selfText,
+      thumbnail: thumbnailLink,
+      url: json['url'],
+      postType: mapPostType(json['post_hint']),
 
       /// downs --- int rating - can be 0 for some reason
       /// ups - int rating+
@@ -110,3 +168,11 @@ class Post {
 /// author_flair_text - string
 /// author_flair_richtext - [{ things }]
 /// author_flair_background_color hex code str
+/// gallery_data - List with gallery item
+///    media_id -> media id to get info from map below
+///    id -> int to grab file? idk
+/// media_metadata - Map<imageId, Map> with images description
+///    status - valid|invalid ?
+///    e -> type? 'Image'
+///    m -> meta 'image/jpg'
+///    p -> preview Map ->  ???
