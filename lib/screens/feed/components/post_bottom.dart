@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bluejay/types/reddit_post.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class PostBottom extends StatelessWidget {
@@ -28,6 +29,7 @@ class PostBottom extends StatelessWidget {
           enableFeedback: true,
           onPressed: () {
             print('up');
+            HapticFeedback.lightImpact();
           },
         ),
         Text(formatter.format(post.score)),
@@ -38,6 +40,7 @@ class PostBottom extends StatelessWidget {
           enableFeedback: true,
           onPressed: () {
             print('down');
+            HapticFeedback.vibrate();
           },
         ),
       ],
