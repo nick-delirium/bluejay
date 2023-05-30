@@ -46,6 +46,16 @@ class RedditAPI {
     return posts;
   }
 
+  // List<dynamic>
+  Future<void> fetchComments(String sub, String postId) async {
+    var comments =
+        await _reddit.sub(sub).comments(postId).filter('depth', 3).fetch();
+
+    /// TODO: map this maddness, create comment class
+    print(comments);
+    // return comments['data']
+  }
+
   Uri startAuth() {
     String? apiKey = dotenv.env['API_KEY'];
     if (apiKey == null) {

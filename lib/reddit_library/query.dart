@@ -12,11 +12,12 @@ class Query {
 
   /// Fetch the data from the API. Returns a JSON Map.
   /// Throws a [RedditApiException] of the API returned invalid JSON.
-  Future<Map<String, dynamic>> fetch() async {
+  Future<dynamic> fetch() async {
     Uri uri = _redditUri(resourse, params);
     http.Response response = await _reddit.client.get(uri);
     try {
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      print(jsonDecode(response.body).runtimeType);
+      return jsonDecode(response.body) as dynamic;
     } on FormatException catch (e) {
       var exc = RedditApiException("Exception in parsing JSON from $uri", e);
       throw exc;

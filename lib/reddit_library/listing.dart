@@ -63,7 +63,7 @@ class Listing extends FilterableQuery implements Stream<ListingResult> {
 
   @override
   Future<ListingResult> fetch() {
-    return super.fetch().then((Map<String, dynamic> result) {
+    return super.fetch().then((result) {
       if (result.containsKey("data")) {
         params["after"] = result["data"]["after"];
         params["before"] = result["data"]["before"];

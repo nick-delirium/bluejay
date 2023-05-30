@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 
 /// reddit api lib
 import 'reddit.dart';
@@ -10,7 +11,11 @@ import 'reddit.dart';
 /// components
 import 'screens/profile/auth_handler.dart';
 import 'screens/feed/feed_view.dart';
+import 'screens/post/reddit_post.dart';
+
+/// state
 import 'screens/feed/feed_state.dart';
+import 'screens/post/post_state.dart';
 
 void main() async {
   FlutterError.onError = (details) {
@@ -32,29 +37,43 @@ class Bluejay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Brightness.dark;
-    return MaterialApp(
-        title: 'bluejay',
-        theme: ThemeData(
-          useMaterial3: true,
-          brightness: theme,
-          colorSchemeSeed: Colors.deepPurple,
-        ),
-        home: MultiProvider(providers: [
+    return MultiProvider(
+        providers: [
           ChangeNotifierProvider<FeedState>(create: (_) => FeedState()),
           ChangeNotifierProvider<AppState>(create: (_) => AppState()),
-        ], child: MainLayout()));
-    // return ChangeNotifierProvider(
-    //   create: (context) => MyAppState(),
-    //   child: MaterialApp(
-    //     title: 'Namer App',
-    //     theme: ThemeData(
-    //       useMaterial3: true,
-    //       colorScheme: ColorScheme.fromSeed(
-    //           seedColor: Colors.deepPurple, brightness: Brightness.dark),
-    //     ),
-    //     home: MyHomePage(),
-    //   ),
-    // );
+          ChangeNotifierProvider<PostState>(create: (_) => PostState()),
+        ],
+        child: MaterialApp.router(
+          title: 'bluejay',
+          theme: ThemeData(
+            useMaterial3: true,
+            brightness: theme,
+            colorSchemeSeed: Colors.deepPurple,
+          ),
+          routerConfig: _router,
+        ));
+  }
+}
+
+final _router = GoRouter(routes: [
+  GoRoute(
+    path: '/',
+    builder: (context, state) => MainLayout(),
+  ),
+  GoRoute(path: '/post', builder: (context, state) => PostLayout())
+]);
+
+class PostLayout extends StatelessWidget {
+  const PostLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return (Scaffold(
+      appBar: AppBar(title: Text('Feed'), elevation: 2),
+      body: RedditPostView(
+        isExpanded: true,
+      ),
+    ));
   }
 }
 

@@ -38,7 +38,9 @@ FlairTypes mapFlairType(String value) {
 }
 
 class Post {
+  String id;
   String subreddit;
+  String subredditShort;
   String subredditId;
   String title;
   String author;
@@ -66,8 +68,10 @@ class Post {
   String? linkFlairBackgroundColor;
 
   Post({
+    required this.id,
     required this.clicked,
     required this.subreddit,
+    required this.subredditShort,
     required this.subredditId,
     required this.title,
     required this.score,
@@ -101,9 +105,16 @@ class Post {
     String? thumbnailLink =
         json['thumbnail'] != null ? safeThumbnail(json['thumbnail']) : null;
 
+    /// this is getting out of hand
+    /// I couldn't find svg lib for their custom emotes ok?
+    String? safeFlairText =
+        json['link_flair_text']?.replaceAll(RegExp(r':snoo_([^:]+):'), '');
     return Post(
-      /// can use subreddit instead to get just the name
+      id: json['id'],
       subreddit: json['subreddit_name_prefixed'],
+
+      /// without r/
+      subredditShort: json['subreddit'],
       subredditId: json['subreddit_id'],
       title: json['title'],
       selftext: selfText,
@@ -123,7 +134,7 @@ class Post {
       isVideo: json['is_video'],
       hideScore: json['hide_score'],
       spoiler: json['spoiler'],
-      linkFlairText: json['link_flair_text'],
+      linkFlairText: safeFlairText,
       linkFlairType: mapFlairType(json['link_flair_type']),
       linkFlairBackgroundColor: json['link_flair_background_color'],
       createdAt: json['created_utc'].toInt(),
@@ -143,7 +154,6 @@ class Post {
 /// thumbnail_height - int - 0 if no img
 /// top_awarded_type - ?
 /// name - ? t3
-/// score - int rating
 /// total_awards_received - int
 /// media_embed - {}
 /// is_original_content - bool
