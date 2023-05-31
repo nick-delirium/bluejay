@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'types/reddit_post.dart';
+import 'types/reddit_comment.dart';
 
 class RedditAPI {
   /// by default we start with userless client, but on a first request
@@ -47,13 +48,20 @@ class RedditAPI {
   }
 
   // List<dynamic>
-  Future<void> fetchComments(String sub, String postId) async {
-    var comments =
+  Future<List<Comment>> fetchComments(String sub, String postId) async {
+    var rawComments =
         await _reddit.sub(sub).comments(postId).filter('depth', 3).fetch();
+    List<Comment> comments = [];
+    for (var commentList in rawComments) {
+      for (var comment in commentList['data']['children']) {
+        if (comment['kind'] == 't1') {
+          var rawComment = comment['data'];
+          comments.add(Comment.fromJson(rawComment));
+        }
+      }
+    }
 
-    /// TODO: map this maddness, create comment class
-    print(comments);
-    // return comments['data']
+    return comments;
   }
 
   Uri startAuth() {
