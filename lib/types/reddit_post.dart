@@ -25,7 +25,7 @@ PostType mapPostType(String? value) {
   }
 }
 
-FlairTypes mapFlairType(String value) {
+FlairTypes mapFlairType(String? value) {
   switch (value) {
     case 'richtext':
       return FlairTypes.richtext;
@@ -69,11 +69,9 @@ class Post {
 
   Post({
     required this.id,
-    required this.clicked,
     required this.subreddit,
     required this.subredditShort,
     required this.subredditId,
-    required this.title,
     required this.score,
     required this.upvoteRatio,
     required this.over18,
@@ -85,6 +83,8 @@ class Post {
     required this.createdAt,
     required this.url,
     required this.postType,
+    required this.title,
+    required this.clicked,
     this.selftext,
     this.linkFlairText,
     this.linkFlairBackgroundColor,

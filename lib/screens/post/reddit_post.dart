@@ -1,10 +1,11 @@
-import 'components/post_selftext.dart';
-import 'components/post_bottom.dart';
-import 'components/post_header.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bluejay/types/reddit_post.dart';
 import 'post_state.dart';
+import 'components/post_bottom.dart';
+import 'components/post_header.dart';
+import 'components/post_body.dart';
+import 'components/comments.dart';
 
 class RedditPostView extends StatefulWidget {
   const RedditPostView({super.key, required this.isExpanded, this.post});
@@ -34,55 +35,40 @@ class _RedditPostViewState extends State<RedditPostView> {
     var postState = context.watch<PostState>();
 
     Post usedPost = widget.post ?? postState.currentPost!;
-    return Container(
+    String upvoteRatio = "${usedPost.upvoteRatio * 100}%";
+    return SingleChildScrollView(
+        child: Container(
       color: theme.primaryColorDark,
       padding: EdgeInsets.all(8),
-      margin: widget.isExpanded ? EdgeInsets.symmetric(vertical: 6) : null,
+      margin: widget.isExpanded ? null : EdgeInsets.symmetric(vertical: 6),
       child: (Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           PostHeader(
-              subreddit: usedPost.subreddit, createdAt: usedPost.createdAt),
+            subreddit: usedPost.subreddit,
+            createdAt: usedPost.createdAt,
+            isExpanded: widget.isExpanded,
+            author: usedPost.author,
+            title: usedPost.title,
+          ),
           SizedBox(
             height: 3,
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(usedPost.title, style: TextStyle(fontSize: 16)),
-                  if (usedPost.selftext != null)
-                    PostSelfText(
-                        text: usedPost.selftext!,
-                        isExpanded: widget.isExpanded),
-                ],
-              )),
-              if (usedPost.thumbnail != null &&
-                  showThumbNail(usedPost.postType))
-                Padding(
-                  padding: const EdgeInsets.all(6.0),
-                  child: SizedBox(
-                    height: 75,
-                    width: 75,
-                    child: Image.network(
-                      usedPost.thumbnail!,
-                      semanticLabel: 'Post Thumbnail',
-                      fit: BoxFit.fitHeight,
-                    ),
-                  ),
-                )
-            ],
+          PostBody(
+            postType: usedPost.postType,
+            isExpanded: widget.isExpanded,
+            thumbnail: usedPost.thumbnail,
+            selftext: usedPost.selftext,
           ),
-          PostBottom(post: usedPost, isExpanded: widget.isExpanded),
+          PostBottom(
+              isExpanded: widget.isExpanded,
+              score: usedPost.score,
+              linkFlairBackgroundColor: usedPost.linkFlairBackgroundColor,
+              linkFlairText: usedPost.linkFlairText,
+              upvoteRatio: upvoteRatio),
+          Comments(),
         ],
       )),
-    );
+    ));
   }
-}
-
-bool showThumbNail(PostType postType) {
-  return [PostType.link, PostType.text].contains(postType);
 }

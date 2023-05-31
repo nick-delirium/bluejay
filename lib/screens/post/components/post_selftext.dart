@@ -35,10 +35,12 @@ class PostSelfText extends StatelessWidget {
         return null;
       },
       style: {
-        'div': Style(
-            maxLines: 3,
-            textOverflow: TextOverflow.ellipsis,
-            fontWeight: FontWeight.w200),
+        'div': isExpanded
+            ? Style(fontWeight: FontWeight.w200)
+            : Style(
+                maxLines: 3,
+                textOverflow: TextOverflow.ellipsis,
+                fontWeight: FontWeight.w200),
       },
     );
   }
