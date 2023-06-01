@@ -19,36 +19,39 @@ class PostHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              "in ",
-              style: TextStyle(fontWeight: FontWeight.w200, fontSize: 12),
-            ),
-            Text(subreddit),
-            Spacer(),
-            Text(
-              fullDateFromMs(createdAt),
-              style: TextStyle(fontWeight: FontWeight.w200),
-            )
-          ],
-        ),
-        SizedBox(height: 4),
-        Text(title, style: TextStyle(fontSize: 18)),
-        if (isExpanded)
+    return Container(
+      padding: EdgeInsets.all(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Row(
             children: [
               Text(
-                "by ",
+                "in ",
                 style: TextStyle(fontWeight: FontWeight.w200, fontSize: 12),
               ),
-              Text('u/$author'),
+              Text(subreddit),
+              Spacer(),
+              Text(
+                fullDateFromMs(createdAt),
+                style: TextStyle(fontWeight: FontWeight.w200),
+              )
             ],
-          )
-      ],
+          ),
+          SizedBox(height: 4),
+          Text(title, style: TextStyle(fontSize: 18)),
+          if (isExpanded)
+            Row(
+              children: [
+                Text(
+                  "by ",
+                  style: TextStyle(fontWeight: FontWeight.w200, fontSize: 12),
+                ),
+                Text('u/$author'),
+              ],
+            )
+        ],
+      ),
     );
   }
 }

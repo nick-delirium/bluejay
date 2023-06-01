@@ -36,7 +36,7 @@ class Bluejay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Brightness.dark;
+    var brightness = MediaQuery.of(context).platformBrightness;
     return MultiProvider(
         providers: [
           ChangeNotifierProvider<FeedState>(create: (_) => FeedState()),
@@ -47,7 +47,7 @@ class Bluejay extends StatelessWidget {
           title: 'bluejay',
           theme: ThemeData(
             useMaterial3: true,
-            brightness: theme,
+            brightness: brightness,
             colorSchemeSeed: Colors.deepPurple,
           ),
           routerConfig: _router,
@@ -60,6 +60,9 @@ final _router = GoRouter(routes: [
     path: '/',
     builder: (context, state) => MainLayout(),
   ),
+
+  /// TODO
+  GoRoute(path: '/login', builder: (context, state) => MainLayout()),
   GoRoute(path: '/post', builder: (context, state) => PostLayout())
 ]);
 

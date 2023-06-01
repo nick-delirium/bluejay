@@ -26,65 +26,71 @@ class PostBottom extends StatelessWidget {
         ? Color(int.parse("FF${linkFlairBackgroundColor!.replaceAll('#', '')}",
             radix: 16))
         : theme.colorScheme.background;
-    return Row(
-      children: [
-        if (linkFlairText != null)
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-              color: flairColor,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
-              child: Text(
-                linkFlairText!,
-                style: TextStyle(
-                    color: flairColor.computeLuminance() > 0.4
-                        ? Colors.black
-                        : Colors.white),
+    return Container(
+      decoration: BoxDecoration(
+          border: Border(
+              bottom:
+                  BorderSide(width: 2, color: theme.colorScheme.onSurface))),
+      child: Row(
+        children: [
+          if (linkFlairText != null)
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: flairColor,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+                child: Text(
+                  linkFlairText!,
+                  style: TextStyle(
+                      color: flairColor.computeLuminance() > 0.4
+                          ? Colors.black
+                          : Colors.white),
+                ),
               ),
             ),
-          ),
-        if (isExpanded)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 4, 0),
-            child: Icon(
-              Icons.thumb_up_alt,
-              color: theme.colorScheme.onPrimary,
-              semanticLabel: 'Upvote ratio',
-              size: 18,
+          if (isExpanded)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 4, 0),
+              child: Icon(
+                Icons.thumb_up_alt,
+                color: theme.colorScheme.primary,
+                semanticLabel: 'Upvote ratio',
+                size: 18,
+              ),
             ),
+          if (isExpanded) Text(upvoteRatio, style: TextStyle(fontSize: 14)),
+          Spacer(),
+          IconButton(
+            icon: Icon(
+              Icons.arrow_drop_down,
+              semanticLabel: 'Downvote',
+            ),
+            padding: EdgeInsets.all(0),
+            iconSize: 28,
+            enableFeedback: true,
+            onPressed: () {
+              print('down');
+              HapticFeedback.vibrate();
+            },
           ),
-        if (isExpanded) Text(upvoteRatio, style: TextStyle(fontSize: 14)),
-        Spacer(),
-        IconButton(
-          icon: Icon(
-            Icons.arrow_drop_down,
-            semanticLabel: 'Downvote',
+          Text(formatter.format(score)),
+          IconButton(
+            icon: Icon(
+              Icons.arrow_drop_up,
+              semanticLabel: 'Upvote',
+            ),
+            padding: EdgeInsets.all(0),
+            iconSize: 28,
+            enableFeedback: true,
+            onPressed: () {
+              print('up');
+              HapticFeedback.lightImpact();
+            },
           ),
-          padding: EdgeInsets.all(0),
-          iconSize: 28,
-          enableFeedback: true,
-          onPressed: () {
-            print('down');
-            HapticFeedback.vibrate();
-          },
-        ),
-        Text(formatter.format(score)),
-        IconButton(
-          icon: Icon(
-            Icons.arrow_drop_up,
-            semanticLabel: 'Upvote',
-          ),
-          padding: EdgeInsets.all(0),
-          iconSize: 28,
-          enableFeedback: true,
-          onPressed: () {
-            print('up');
-            HapticFeedback.lightImpact();
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
