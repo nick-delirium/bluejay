@@ -18,27 +18,30 @@ class PostBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (selftext != null)
-          Expanded(
-            child: PostSelfText(text: selftext!, isExpanded: isExpanded),
-          ),
-        if (thumbnail != null && showThumbNail(postType))
-          Padding(
-            padding: const EdgeInsets.all(6.0),
-            child: SizedBox(
-              height: 75,
-              width: 75,
-              child: Image.network(
-                thumbnail!,
-                semanticLabel: 'Post Thumbnail',
-                fit: BoxFit.fitHeight,
-              ),
+    return Container(
+      padding: EdgeInsets.all(8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (selftext != null)
+            Expanded(
+              child: PostSelfText(text: selftext!, isExpanded: isExpanded),
             ),
-          )
-      ],
+          if (thumbnail != null && showThumbNail(postType))
+            Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: SizedBox(
+                height: 75,
+                width: 75,
+                child: Image.network(
+                  thumbnail!,
+                  semanticLabel: 'Post Thumbnail',
+                  fit: BoxFit.fitHeight,
+                ),
+              ),
+            )
+        ],
+      ),
     );
   }
 }

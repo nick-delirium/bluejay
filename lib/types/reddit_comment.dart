@@ -2,7 +2,8 @@ import 'reddit_post.dart';
 import 'package:bluejay/utils/strings.dart';
 
 class Comment extends Post {
-  // List replies = [];
+  List<Comment> replies = [];
+  int? hiddenReplies;
   dynamic bannedAtUtc;
   String parentId;
 
@@ -15,7 +16,7 @@ class Comment extends Post {
   int depth;
 
   Comment({
-    // required this.replies,
+    required this.replies,
     required this.bannedAtUtc,
     required this.parentId,
     required this.body,
@@ -35,9 +36,10 @@ class Comment extends Post {
     required url,
     required postType,
     required linkFlairType,
+    this.authorFullname,
+    this.hiddenReplies,
     title,
     clicked,
-    this.authorFullname,
     selftext,
     linkFlairText,
     linkFlairBackgroundColor,
@@ -64,7 +66,6 @@ class Comment extends Post {
         );
 
   factory Comment.fromJson(Map<String, dynamic> json) {
-    print(json);
     String? selfText;
     String body;
     String? bodyHtml = json['body_html'];
@@ -81,13 +82,38 @@ class Comment extends Post {
       body = json['body'];
     }
 
+    int? hiddenReplies;
+    List<Comment> replies = [];
+    // if (json['author'] == 'magicfinbow') {
+    //   print(json);
+    // }
+
+    /// WHY IT CAN BE MAP OR STRING WHATS WRONG WITH YOU DEVS
+    if (json['replies'] is Map<String, dynamic>) {
+      for (var subComment in json['replies']['data']['children']) {
+        if (subComment['kind'] == 'more') {
+          hiddenReplies = subComment['data']['count'];
+        }
+
+        /// fixing "awesome" reddit api engineering where reply can have
+        /// 6 fields out of 70+ and all will be empty +
+        /// id "t3___" (yeah, without actual id).
+        /// goot job reddit api devs?
+        if (subComment['data']['body'] != null) {
+          Comment reply = Comment.fromJson(subComment['data']);
+          replies.add(reply);
+        }
+      }
+    }
+
     /// this is getting out of hand
     /// I couldn't find svg lib for their custom emotes ok?
     String? safeFlairText =
         json['link_flair_text']?.replaceAll(RegExp(r':snoo_([^:]+):'), '');
     return Comment(
       body: body,
-      // replies: json['replies'],
+      replies: replies,
+      hiddenReplies: hiddenReplies,
       bannedAtUtc: json['banned_at_utc'],
       depth: json['depth'],
       authorFullname: json['author_full_name'],

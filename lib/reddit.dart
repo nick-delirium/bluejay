@@ -49,8 +49,8 @@ class RedditAPI {
 
   // List<dynamic>
   Future<List<Comment>> fetchComments(String sub, String postId) async {
-    var rawComments =
-        await _reddit.sub(sub).comments(postId).filter('depth', 3).fetch();
+    // .filter('depth', 3)
+    var rawComments = await _reddit.sub(sub).comments(postId).fetch();
     List<Comment> comments = [];
     for (var commentList in rawComments) {
       for (var comment in commentList['data']['children']) {
