@@ -20,6 +20,8 @@ jobs:
           channel: 'stable'
       - name: install thingies
         run: flutter pub get
+      - name: create env
+        run: echo "API_KEY=123" > .env
       - name: run tests
         run: flutter test --coverage
       - name: Upload coverage reports to Codecov
