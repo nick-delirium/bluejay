@@ -33,7 +33,7 @@ class PostHeader extends StatelessWidget {
               Text(subreddit),
               Spacer(),
               Text(
-                fullDateFromMs(createdAt),
+                fullDateFromMs(createdAt, false),
                 style: TextStyle(fontWeight: FontWeight.w200),
               )
             ],

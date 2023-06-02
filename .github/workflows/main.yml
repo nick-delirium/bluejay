@@ -14,7 +14,11 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
+      - name: install thingies
+        run: flutter pub get
+      - name: run tests
+        run: flutter test --coverage
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
-        env: 
+        env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
