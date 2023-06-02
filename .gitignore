@@ -46,3 +46,6 @@ app.*.map.json
 # :)
 .env
 todo.md
+
+# obfuscation symbols because I don't know where to put them
+testapp/debuginfo
