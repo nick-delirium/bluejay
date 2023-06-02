@@ -36,83 +36,131 @@ class _RedditPostViewState extends State<RedditPostView> {
 
     Post usedPost = widget.post ?? postState.currentPost!;
     String upvoteRatio = "${usedPost.upvoteRatio * 100}%";
+
+    if (usedPost.postType == PostType.link) {
+      print('POST LINK ${usedPost.title} ${usedPost.url}');
+    }
+    if (usedPost.images.length > 1 || usedPost.isGallery == true) {
+      print('GALLERY  ${usedPost.title}');
+    }
     if (widget.isExpanded) {
-      print('Im expanded');
-      return SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
+      return ExpandedPost(
+          theme: theme, usedPost: usedPost, upvoteRatio: upvoteRatio);
+    } else {
+      return FeedPost(
+          theme: theme, usedPost: usedPost, upvoteRatio: upvoteRatio);
+    }
+  }
+}
+
+class FeedPost extends StatelessWidget {
+  const FeedPost({
+    super.key,
+    required this.theme,
+    required this.usedPost,
+    required this.upvoteRatio,
+  });
+
+  final ThemeData theme;
+  final Post usedPost;
+  final String upvoteRatio;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: theme.colorScheme.surface,
+      margin: EdgeInsets.symmetric(vertical: 6),
+      child: (Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          PostHeader(
+            subreddit: usedPost.subreddit,
+            createdAt: usedPost.createdAt,
+            isExpanded: false,
+            author: usedPost.author,
+            title: usedPost.title,
           ),
-          child: Container(
-            color: theme.colorScheme.surface,
-            margin:
-                widget.isExpanded ? null : EdgeInsets.symmetric(vertical: 6),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                PostHeader(
-                  subreddit: usedPost.subreddit,
-                  createdAt: usedPost.createdAt,
-                  isExpanded: widget.isExpanded,
-                  author: usedPost.author,
-                  title: usedPost.title,
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                if (usedPost.selftext != null || usedPost.thumbnail != null)
-                  PostBody(
-                    postType: usedPost.postType,
-                    isExpanded: widget.isExpanded,
-                    thumbnail: usedPost.thumbnail,
-                    selftext: usedPost.selftext,
-                  ),
-                PostBottom(
-                    isExpanded: widget.isExpanded,
-                    score: usedPost.score,
-                    linkFlairBackgroundColor: usedPost.linkFlairBackgroundColor,
-                    linkFlairText: usedPost.linkFlairText,
-                    upvoteRatio: upvoteRatio),
-                if (widget.isExpanded) Comments(),
-              ],
+          SizedBox(
+            height: 3,
+          ),
+          if (usedPost.selftext != null || usedPost.thumbnail != null)
+            PostBody(
+              postType: usedPost.postType,
+              isExpanded: false,
+              thumbnail: usedPost.thumbnail,
+              selftext: usedPost.selftext,
+              images: usedPost.images,
+              postUrl: usedPost.url,
             ),
+          PostBottom(
+              postType: usedPost.postType,
+              isExpanded: false,
+              score: usedPost.score,
+              linkFlairBackgroundColor: usedPost.linkFlairBackgroundColor,
+              linkFlairText: usedPost.linkFlairText,
+              upvoteRatio: upvoteRatio),
+        ],
+      )),
+    );
+  }
+}
+
+class ExpandedPost extends StatelessWidget {
+  const ExpandedPost({
+    super.key,
+    required this.theme,
+    required this.usedPost,
+    required this.upvoteRatio,
+  });
+
+  final ThemeData theme;
+  final Post usedPost;
+  final String upvoteRatio;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height,
+        ),
+        child: Container(
+          color: theme.colorScheme.surface,
+          margin: null,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              PostHeader(
+                subreddit: usedPost.subreddit,
+                createdAt: usedPost.createdAt,
+                isExpanded: true,
+                author: usedPost.author,
+                title: usedPost.title,
+              ),
+              if (usedPost.selftext != null ||
+                  usedPost.thumbnail != null ||
+                  usedPost.images.isNotEmpty)
+                PostBody(
+                  postType: usedPost.postType,
+                  isExpanded: true,
+                  thumbnail: usedPost.thumbnail,
+                  selftext: usedPost.selftext,
+                  postUrl: usedPost.url,
+                  images: usedPost.images,
+                ),
+              PostBottom(
+                  postType: usedPost.postType,
+                  isExpanded: true,
+                  score: usedPost.score,
+                  linkFlairBackgroundColor: usedPost.linkFlairBackgroundColor,
+                  linkFlairText: usedPost.linkFlairText,
+                  upvoteRatio: upvoteRatio),
+              Comments(),
+            ],
           ),
         ),
-      );
-    } else {
-      return Container(
-        color: theme.colorScheme.surface,
-        margin: widget.isExpanded ? null : EdgeInsets.symmetric(vertical: 6),
-        child: (Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            PostHeader(
-              subreddit: usedPost.subreddit,
-              createdAt: usedPost.createdAt,
-              isExpanded: widget.isExpanded,
-              author: usedPost.author,
-              title: usedPost.title,
-            ),
-            SizedBox(
-              height: 3,
-            ),
-            if (usedPost.selftext != null || usedPost.thumbnail != null)
-              PostBody(
-                postType: usedPost.postType,
-                isExpanded: widget.isExpanded,
-                thumbnail: usedPost.thumbnail,
-                selftext: usedPost.selftext,
-              ),
-            PostBottom(
-                isExpanded: widget.isExpanded,
-                score: usedPost.score,
-                linkFlairBackgroundColor: usedPost.linkFlairBackgroundColor,
-                linkFlairText: usedPost.linkFlairText,
-                upvoteRatio: upvoteRatio),
-          ],
-        )),
-      );
-    }
+      ),
+    );
   }
 }

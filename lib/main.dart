@@ -58,11 +58,17 @@ class Bluejay extends StatelessWidget {
 final _router = GoRouter(routes: [
   GoRoute(
     path: '/',
-    builder: (context, state) => MainLayout(),
+    builder: (context, state) => MainLayout(
+      startViewIndex: 0,
+    ),
   ),
 
   /// TODO
-  GoRoute(path: '/login', builder: (context, state) => MainLayout()),
+  GoRoute(
+      path: '/login',
+      builder: (context, state) => MainLayout(
+            startViewIndex: 3,
+          )),
   GoRoute(path: '/post', builder: (context, state) => PostLayout())
 ]);
 
@@ -81,6 +87,10 @@ class PostLayout extends StatelessWidget {
 }
 
 class MainLayout extends StatefulWidget {
+  final int startViewIndex;
+
+  const MainLayout({Key? key, required this.startViewIndex}) : super(key: key);
+
   @override
   State<MainLayout> createState() => MainLayoutState();
 }
@@ -103,6 +113,7 @@ class MainLayoutState extends State<MainLayout> {
   @override
   void initState() {
     super.initState();
+    _onViewChange(widget.startViewIndex);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       var appState = Provider.of<AppState>(context, listen: false);
       await appState.getAuthState();
