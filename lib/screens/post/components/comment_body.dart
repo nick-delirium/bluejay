@@ -24,7 +24,7 @@ class CommentBody extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             Text(
-              fullDateFromMs(comment.createdAt),
+              fullDateFromMs(comment.createdAt, false),
               style: TextStyle(fontWeight: FontWeight.w200),
             )
           ],
