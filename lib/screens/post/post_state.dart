@@ -30,7 +30,6 @@ class PostState extends ChangeNotifier {
     // reddit.sub("dartlang").comments("2ek93l").depth(3).fetch().then(print);
     comments =
         await _api.fetchComments(currentPost!.subredditShort, currentPost!.id);
-    print(comments.length);
     isLoading = false;
     notifyListeners();
   }

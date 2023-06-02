@@ -69,11 +69,6 @@ class Listing extends FilterableQuery implements Stream<ListingResult> {
         params["before"] = result["data"]["before"];
       }
 
-      /// debugging and typing reddit api here...
-      // for (var key in result['data']['children'][1]['data'].keys) {
-      //   var value = result['data']['children'][1]['data'][key];
-      //   print("$key --- $value");
-      // }
       ListingResult res = ListingResult(result, this);
       _controller.add(res);
       return res;

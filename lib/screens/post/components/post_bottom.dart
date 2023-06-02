@@ -101,6 +101,5 @@ class PostBottom extends StatelessWidget {
 }
 
 String enumToString(PostType value) {
-  print(value);
   return value.toString().split('.').last.toUpperCase();
 }

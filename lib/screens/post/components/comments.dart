@@ -24,26 +24,24 @@ class CommentsViewState extends State<Comments> {
                 child: CircularProgressIndicator(),
               ),
             )
-          : Flexible(
-              child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: postState.comments.length,
-                  itemBuilder: (context, index) {
-                    var comment = postState.comments.elementAt(index);
-                    return Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                            border: Border(
-                                bottom: BorderSide(
-                                    width: 2,
-                                    color: theme.colorScheme.onBackground))),
-                        child: CommentBody(
-                          comment: comment,
-                        ));
-                  }),
-            ),
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: postState.comments.length,
+              itemBuilder: (context, index) {
+                var comment = postState.comments.elementAt(index);
+                return Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        border: Border(
+                            bottom: BorderSide(
+                                width: 2,
+                                color: theme.colorScheme.onBackground))),
+                    child: CommentBody(
+                      comment: comment,
+                    ));
+              }),
     );
   }
 }

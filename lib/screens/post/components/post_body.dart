@@ -22,9 +22,6 @@ class PostBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (postType == PostType.link) {
-      print('url --> $postUrl');
-    }
     final theme = Theme.of(context);
     return Container(
       padding: EdgeInsets.all(8),
@@ -51,7 +48,7 @@ class PostBody extends StatelessWidget {
                   child: PostSelfText(text: selftext!, isExpanded: isExpanded),
                 ),
               if (thumbnail != null && showThumbNail(postType))
-                Flexible(
+                Expanded(
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(6.0),
@@ -67,7 +64,7 @@ class PostBody extends StatelessWidget {
                   ),
                 ),
               if (postUrl != null && postType == PostType.link)
-                Flexible(
+                Expanded(
                   flex: 3,
                   child: Text(
                     '$postUrl',

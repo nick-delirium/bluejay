@@ -85,9 +85,6 @@ class Comment extends Post {
 
     int? hiddenReplies;
     List<Comment> replies = [];
-    // if (json['author'] == 'magicfinbow') {
-    //   print(json);
-    // }
 
     /// WHY IT CAN BE MAP OR STRING WHATS WRONG WITH YOU DEVS
     if (json['replies'] is Map<String, dynamic>) {
