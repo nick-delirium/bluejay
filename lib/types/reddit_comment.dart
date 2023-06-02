@@ -44,6 +44,7 @@ class Comment extends Post {
     linkFlairText,
     linkFlairBackgroundColor,
   }) : super(
+          images: [],
           id: id,
           clicked: false,
           subreddit: subreddit,

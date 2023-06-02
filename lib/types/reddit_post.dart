@@ -37,6 +37,13 @@ FlairTypes mapFlairType(String? value) {
   }
 }
 
+class PostImage {
+  String preview;
+  String source;
+
+  PostImage(this.preview, this.source);
+}
+
 class Post {
   String id;
   String subreddit;
@@ -61,6 +68,7 @@ class Post {
 
   /// if its image gallery
   bool? isGallery;
+  List<PostImage> images;
 
   /// flair on post
   FlairTypes linkFlairType;
@@ -85,6 +93,7 @@ class Post {
     required this.postType,
     required this.title,
     required this.clicked,
+    required this.images,
     this.selftext,
     this.linkFlairText,
     this.linkFlairBackgroundColor,
@@ -109,6 +118,23 @@ class Post {
     /// I couldn't find svg lib for their custom emotes ok?
     String? safeFlairText =
         json['link_flair_text']?.replaceAll(RegExp(r':snoo_([^:]+):'), '');
+
+    PostType type = mapPostType(json['post_hint']);
+    List<PostImage> images = [];
+    if (type == PostType.image) {
+      // bool isRedditMedia = json['is_reddit_media_domain'];
+      // String domain = json['domain'];
+      List<dynamic> links = json['preview']['images'];
+      for (var link in links) {
+        List<dynamic> resolutions = link['resolutions'];
+        var preview = resolutions.firstWhere(
+            (preview) => preview['width'] >= 320,
+            orElse: () => resolutions[0]);
+        var sourceUrl = safeThumbnail(link['source']['url']);
+        var previewUrl = safeThumbnail(preview['url']);
+        images.add(PostImage(previewUrl!, sourceUrl!));
+      }
+    }
     return Post(
       id: json['id'],
       subreddit: json['subreddit_name_prefixed'],
@@ -120,7 +146,8 @@ class Post {
       selftext: selfText,
       thumbnail: thumbnailLink,
       url: json['url'],
-      postType: mapPostType(json['post_hint']),
+      postType: type,
+      images: images,
 
       /// downs --- int rating - can be 0 for some reason
       /// ups - int rating+
