@@ -36,6 +36,7 @@ class Comment extends Post {
     required url,
     required postType,
     required linkFlairType,
+    required permalink,
     this.authorFullname,
     this.hiddenReplies,
     title,
@@ -44,6 +45,9 @@ class Comment extends Post {
     linkFlairText,
     linkFlairBackgroundColor,
   }) : super(
+          isGallery: false,
+          commentsAmount: 0,
+          permalink: permalink,
           images: [],
           id: id,
           clicked: false,
@@ -110,6 +114,7 @@ class Comment extends Post {
         json['link_flair_text']?.replaceAll(RegExp(r':snoo_([^:]+):'), '');
     return Comment(
       body: body,
+      permalink: json['permalink'],
       replies: replies,
       hiddenReplies: hiddenReplies,
       bannedAtUtc: json['banned_at_utc'],
