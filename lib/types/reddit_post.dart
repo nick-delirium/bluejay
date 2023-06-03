@@ -10,6 +10,7 @@ enum PostType {
 
   /// 'hosted:video'
   video,
+  gallery,
 }
 
 PostType mapPostType(String? value) {
@@ -61,21 +62,25 @@ class Post {
   String url;
   PostType postType;
   bool isVideo;
+  String permalink;
   String? thumbnail;
 
   /// !!! can be empty
   String? selftext;
 
   /// if its image gallery
-  bool? isGallery;
+  bool isGallery;
   List<PostImage> images;
 
   /// flair on post
   FlairTypes linkFlairType;
   String? linkFlairText;
   String? linkFlairBackgroundColor;
+  int? commentsAmount;
 
   Post({
+    required this.commentsAmount,
+    required this.permalink,
     required this.id,
     required this.subreddit,
     required this.subredditShort,
@@ -94,6 +99,7 @@ class Post {
     required this.title,
     required this.clicked,
     required this.images,
+    required this.isGallery,
     this.selftext,
     this.linkFlairText,
     this.linkFlairBackgroundColor,
@@ -135,9 +141,23 @@ class Post {
         images.add(PostImage(previewUrl!, sourceUrl!));
       }
     }
+    bool isGallery = json['is_gallery'] ?? false;
+    List<PostImage> galleryImages = [];
+    if (isGallery) {
+      var mediaMeta = json['media_metadata'];
+      for (var media in json['gallery_data']['items']) {
+        var postMedia = mediaMeta[media['media_id']];
+        if (postMedia != null) {
+          var link = safeThumbnail(postMedia['s']['u']);
+          galleryImages.add(PostImage(link!, link));
+        }
+      }
+    }
     return Post(
+      commentsAmount: json['num_comments'],
       id: json['id'],
       subreddit: json['subreddit_name_prefixed'],
+      isGallery: isGallery,
 
       /// without r/
       subredditShort: json['subreddit'],
@@ -146,8 +166,9 @@ class Post {
       selftext: selfText,
       thumbnail: thumbnailLink,
       url: json['url'],
-      postType: type,
-      images: images,
+      permalink: json['permalink'],
+      postType: isGallery ? PostType.gallery : type,
+      images: isGallery ? galleryImages : images,
 
       /// downs --- int rating - can be 0 for some reason
       /// ups - int rating+

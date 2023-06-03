@@ -37,12 +37,6 @@ class _RedditPostViewState extends State<RedditPostView> {
     Post usedPost = widget.post ?? postState.currentPost!;
     String upvoteRatio = "${usedPost.upvoteRatio * 100}%";
 
-    if (usedPost.postType == PostType.link) {
-      print('POST LINK ${usedPost.title} ${usedPost.url}');
-    }
-    if (usedPost.images.length > 1 || usedPost.isGallery == true) {
-      print('GALLERY  ${usedPost.title}');
-    }
     if (widget.isExpanded) {
       return ExpandedPost(
           theme: theme, usedPost: usedPost, upvoteRatio: upvoteRatio);
@@ -79,6 +73,9 @@ class FeedPost extends StatelessWidget {
             isExpanded: false,
             author: usedPost.author,
             title: usedPost.title,
+            linkFlairBackgroundColor: usedPost.linkFlairBackgroundColor,
+            linkFlairText: usedPost.linkFlairText,
+            postType: usedPost.postType,
           ),
           SizedBox(
             height: 3,
@@ -93,12 +90,14 @@ class FeedPost extends StatelessWidget {
               postUrl: usedPost.url,
             ),
           PostBottom(
-              postType: usedPost.postType,
-              isExpanded: false,
-              score: usedPost.score,
-              linkFlairBackgroundColor: usedPost.linkFlairBackgroundColor,
-              linkFlairText: usedPost.linkFlairText,
-              upvoteRatio: upvoteRatio),
+            postType: usedPost.postType,
+            isExpanded: false,
+            score: usedPost.score,
+            upvoteRatio: upvoteRatio,
+            postUrl: usedPost.permalink,
+            mediaUrl: usedPost.url,
+            commentsAmount: usedPost.commentsAmount,
+          ),
         ],
       )),
     );
@@ -137,6 +136,9 @@ class ExpandedPost extends StatelessWidget {
                 isExpanded: true,
                 author: usedPost.author,
                 title: usedPost.title,
+                linkFlairBackgroundColor: usedPost.linkFlairBackgroundColor,
+                linkFlairText: usedPost.linkFlairText,
+                postType: usedPost.postType,
               ),
               if (usedPost.selftext != null ||
                   usedPost.thumbnail != null ||
@@ -150,12 +152,14 @@ class ExpandedPost extends StatelessWidget {
                   images: usedPost.images,
                 ),
               PostBottom(
-                  postType: usedPost.postType,
-                  isExpanded: true,
-                  score: usedPost.score,
-                  linkFlairBackgroundColor: usedPost.linkFlairBackgroundColor,
-                  linkFlairText: usedPost.linkFlairText,
-                  upvoteRatio: upvoteRatio),
+                postType: usedPost.postType,
+                isExpanded: true,
+                score: usedPost.score,
+                upvoteRatio: upvoteRatio,
+                postUrl: usedPost.permalink,
+                mediaUrl: usedPost.url,
+                commentsAmount: usedPost.commentsAmount,
+              ),
               Comments(),
             ],
           ),
