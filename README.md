@@ -5,7 +5,6 @@ I'm working ONLY on android client.
 
 MVP WIP status: 50% done.
 
-<img width="340" alt="image" src="https://github.com/nick-delirium/bluejay/assets/23126999/6a4f85c6-909e-475e-969b-73dcb26583ca">
 <img width="340" alt="image" src="https://github.com/nick-delirium/bluejay/assets/23126999/a3aea1b4-a0cc-492e-9868-dc056ab2fbbe">
 <img width="340" alt="image" src="https://github.com/nick-delirium/bluejay/assets/23126999/9e3a32ad-e466-4cdd-b897-eabf0675474d">
 
