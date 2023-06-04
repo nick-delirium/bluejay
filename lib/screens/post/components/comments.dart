@@ -26,6 +26,7 @@ class CommentsViewState extends State<Comments> {
             )
           : ListView.builder(
               shrinkWrap: true,
+              primary: false,
               physics: NeverScrollableScrollPhysics(),
               itemCount: postState.comments.length,
               itemBuilder: (context, index) {
@@ -40,6 +41,7 @@ class CommentsViewState extends State<Comments> {
                                 color: theme.colorScheme.onBackground))),
                     child: CommentBody(
                       comment: comment,
+                      level: 1,
                     ));
               }),
     );

@@ -8,8 +8,20 @@ class FeedState extends ChangeNotifier {
   final RedditAPI _api = redditApi;
   bool isLoading = false;
 
+  String get feedSort => _api.feedSort;
+
   Future<void> fetchBest() async {
-    data = await _api.getHot(30, 0);
+    data = await _api.getHomeHot(30, 0);
+    notifyListeners();
+  }
+
+  Future<void> fetchHome() async {
+    data = await _api.fetchHome(30, 0);
+    notifyListeners();
+  }
+
+  setSort(Sort type) {
+    _api.setFeedSort(type);
     notifyListeners();
   }
 

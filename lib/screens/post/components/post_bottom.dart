@@ -39,6 +39,9 @@ class PostBottom extends StatelessWidget {
         children: [
           if (isWithMedia)
             PopupMenuButton(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
               icon: Icon(
                 Icons.share,
                 semanticLabel: "Share post",

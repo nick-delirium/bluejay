@@ -12,6 +12,13 @@ class Listings {
 
   /// The parameter [t] is equivalent to using the "t" filter.
   /// Allowed filters are "t" and all Listing filters.
+  Listing self(String? t) {
+    Listing listing = Listing(_reddit, "", {}, ["t"]);
+    return t != null ? listing.filter("t", t) as Listing : listing;
+  }
+
+  /// The parameter [t] is equivalent to using the "t" filter.
+  /// Allowed filters are "t" and all Listing filters.
   Listing controversial([String? t]) {
     Listing listing = Listing(_reddit, _res("controversial"), {}, ["t"]);
     return t != null ? listing.filter("t", t) as Listing : listing;

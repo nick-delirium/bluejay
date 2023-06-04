@@ -8,6 +8,7 @@ void main() {
     setUp(() {
       // Create a sample Post object for testing
       post = Post.fromJson({
+        'permalink': 'r/test',
         'id': '123',
         'subreddit_name_prefixed': 'r/flutter',
         'subreddit': 'flutter',
@@ -52,7 +53,7 @@ void main() {
       expect(post.title, 'Sample Post');
       expect(post.images.length, 0);
       expect(post.selftext, isNull);
-      expect(post.isGallery, isNull);
+      expect(post.isGallery, false);
       expect(post.linkFlairText, 'Flair');
       expect(post.linkFlairBackgroundColor, '#FF0000');
       expect(post.thumbnail, 'https://example.com/thumbnail.jpg');

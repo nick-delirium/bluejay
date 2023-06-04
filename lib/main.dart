@@ -12,6 +12,7 @@ import 'reddit.dart';
 import 'screens/profile/auth_handler.dart';
 import 'screens/feed/feed_view.dart';
 import 'screens/post/reddit_post.dart';
+import 'components/fab_menu.dart';
 
 /// state
 import 'screens/feed/feed_state.dart';
@@ -123,35 +124,36 @@ class MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
+    var theme = Theme.of(context);
+    var feedState = context.watch<FeedState>();
+
+    List<String> viewTitles = [
+      "${feedState.feedSort} Feed",
+      "Search",
+      "Profile"
+    ];
     return Scaffold(
-      appBar: AppBar(
-        title: Text("BlueJay"),
-        elevation: 2,
-      ),
-      body: _views.elementAt(viewIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.table_rows_rounded), label: 'Feed'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.search_rounded), label: 'Search'),
-          BottomNavigationBarItem(
-              icon: Icon(appState.isAuth ? Icons.person : Icons.login),
-              label: appState.isAuth ? 'Profile' : 'Log In')
-        ],
-        onTap: _onViewChange,
-        currentIndex: viewIndex,
-      ),
-      // TODO: add button
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => setState(() {
-      //     _count++;
-      //   }),
-      //   tooltip: 'Increment Counter',
-      //   child: const Icon(Icons.add),
-      // ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked
-    );
+        appBar: AppBar(
+          title: Text(viewTitles.elementAt(viewIndex)),
+          elevation: 2,
+        ),
+        body: _views.elementAt(viewIndex),
+        bottomNavigationBar: BottomNavigationBar(
+          items: [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.table_rows_rounded), label: 'Feed'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.search_rounded), label: 'Search'),
+            BottomNavigationBarItem(
+                icon: Icon(appState.isAuth ? Icons.person : Icons.login),
+                label: appState.isAuth ? 'Profile' : 'Log In')
+          ],
+          onTap: _onViewChange,
+          currentIndex: viewIndex,
+        ),
+        floatingActionButton: FABMenu(theme: theme, feedState: feedState),
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.miniEndFloat);
   }
 }
 

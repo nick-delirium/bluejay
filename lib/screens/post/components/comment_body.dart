@@ -1,13 +1,47 @@
-import 'package:bluejay/utils/time.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter/material.dart';
 import 'package:bluejay/types/reddit_comment.dart';
-import 'dart:math';
+import 'package:flutter/services.dart';
+import 'package:bluejay/utils/colors.dart';
 
-class CommentBody extends StatelessWidget {
-  const CommentBody({super.key, required this.comment});
+import 'comment_header.dart';
+import 'comment_bottom.dart';
+
+class CommentBody extends StatefulWidget {
+  const CommentBody(
+      {super.key, required this.comment, required this.level, this.showAll});
 
   final Comment comment;
+  final bool? showAll;
+  final int level;
+
+  @override
+  State<CommentBody> createState() => _CommentBodyState();
+}
+
+class _CommentBodyState extends State<CommentBody> {
+  bool isExpanded = false;
+  bool showAll = false;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      isExpanded = widget.level < 3;
+    });
+  }
+
+  toggleExpand() {
+    setState(() {
+      isExpanded = !isExpanded;
+    });
+  }
+
+  showAllTree() {
+    setState(() {
+      showAll = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,68 +50,77 @@ class CommentBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "u/${comment.author}",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            Text(
-              fullDateFromMs(comment.createdAt, false),
-              style: TextStyle(fontWeight: FontWeight.w200),
-            )
-          ],
+        CommentHeader(
+          comment: widget.comment,
         ),
-        Html(
-          data: comment.body,
-          onLinkTap: (url, context, attributes, element) {
-            print(url);
+        GestureDetector(
+          onLongPress: () {
+            setState(() {
+              if (showAll) {
+                isExpanded = false;
+                showAll = false;
+              } else {
+                isExpanded = !isExpanded;
+              }
+            });
           },
-          onImageTap: (url, context, attributes, element) {
-            print(url);
-          },
-          onImageError: (exception, stackTrace) {
-            print(exception);
-          },
-          onCssParseError: (css, messages) {
-            print("css that errored: $css");
-            print("error messages:");
-            for (var element in messages) {
-              print(element);
-            }
-            return null;
-          },
+          child: Html(
+            data: widget.comment.body,
+            onLinkTap: (url, context, attributes, element) {
+              print(url);
+            },
+            onImageTap: (url, context, attributes, element) {
+              print(url);
+            },
+            onImageError: (exception, stackTrace) {
+              print(exception);
+            },
+            onCssParseError: (css, messages) {
+              print("css that errored: $css");
+              print("error messages:");
+              for (var element in messages) {
+                print(element);
+              }
+              return null;
+            },
+          ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Icon(Icons.arrow_drop_down),
-            Text(comment.score.toString()),
-            Icon(Icons.arrow_drop_up),
-          ],
+        CommentBottom(
+          comment: widget.comment,
         ),
-        if (comment.replies.isNotEmpty || comment.hiddenReplies != null)
+        if (widget.comment.replies.isNotEmpty ||
+            widget.comment.hiddenReplies != null)
           Container(
             decoration: BoxDecoration(
                 border:
                     Border(left: BorderSide(color: subCommentColor, width: 2))),
             child: Padding(
               padding: EdgeInsets.fromLTRB(12, 8, 0, 0),
-              child: comment.replies.isNotEmpty
+              child: showChildren(widget.comment.replies.isNotEmpty, isExpanded,
+                      showAll, widget.level)
                   ? Column(
                       children: [
-                        for (var subComment in comment.replies)
+                        for (var subComment in widget.comment.replies)
                           CommentBody(
-                            comment: subComment,
-                          )
+                              comment: subComment, level: widget.level + 1)
                       ],
                     )
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        '${comment.hiddenReplies} skipped',
-                        style: TextStyle(color: theme.colorScheme.primary),
+                  : GestureDetector(
+                      onTap: () {
+                        if (widget.comment.replies.isEmpty) {
+                          HapticFeedback.vibrate();
+                        } else {
+                          setState(() {
+                            showAll = true;
+                          });
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          '${widget.comment.hiddenReplies} skipped',
+                          style: TextStyle(color: theme.colorScheme.primary),
+                        ),
                       ),
                     ),
             ),
@@ -87,19 +130,13 @@ class CommentBody extends StatelessWidget {
   }
 }
 
-Color rainbow() {
-  final colors = [
-    Colors.red,
-    Colors.orange,
-    Colors.yellow,
-    Colors.green,
-    Colors.blue,
-    Colors.indigo,
-    Colors.pink,
-    Colors.lightBlue,
-    Colors.blueGrey
-  ];
-  final random = Random();
-  final index = random.nextInt(colors.length);
-  return colors[index];
+bool showChildren(bool hasChildren, bool isExpanded, bool showAll, int level) {
+  if (hasChildren) {
+    if (showAll) {
+      return true;
+    } else {
+      return isExpanded && level < 3;
+    }
+  }
+  return false;
 }
