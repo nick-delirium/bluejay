@@ -78,8 +78,14 @@ class PostLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var postState = context.watch<PostState>();
     return (Scaffold(
-      appBar: AppBar(title: Text('Feed'), elevation: 2),
+      appBar: AppBar(
+          title: Text(
+            postState.currentPost!.title,
+            overflow: TextOverflow.ellipsis,
+          ),
+          elevation: 2),
       body: RedditPostView(
         isExpanded: true,
       ),
