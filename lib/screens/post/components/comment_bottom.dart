@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:bluejay/types/reddit_comment.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:bluejay/reddit_library/reddit.dart';
+import 'package:bluejay/screens/post/post_state.dart';
+import 'package:bluejay/components/rating.dart';
 
 class CommentBottom extends StatelessWidget {
   const CommentBottom({
@@ -12,6 +16,8 @@ class CommentBottom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var postState = context.watch<PostState>();
+
     return Row(
       children: [
         IconButton(
@@ -21,9 +27,16 @@ class CommentBottom extends StatelessWidget {
           },
         ),
         Spacer(),
-        Icon(Icons.arrow_drop_down),
-        Text(comment.score.toString()),
-        Icon(Icons.arrow_drop_up),
+        Rating(
+            voteDir: comment.upvoteDir,
+            onUp: () => postState.commentVote(comment,
+                comment.upvoteDir == VoteDir.up ? VoteDir.neutral : VoteDir.up),
+            onDown: () => postState.commentVote(
+                comment,
+                comment.upvoteDir == VoteDir.down
+                    ? VoteDir.neutral
+                    : VoteDir.down),
+            score: comment.score)
       ],
     );
   }

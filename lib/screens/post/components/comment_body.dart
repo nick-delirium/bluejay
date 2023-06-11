@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:bluejay/types/reddit_comment.dart';
 import 'package:flutter/services.dart';
 import 'package:bluejay/utils/colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'comment_header.dart';
 import 'comment_bottom.dart';
@@ -67,7 +68,9 @@ class _CommentBodyState extends State<CommentBody> {
           child: Html(
             data: widget.comment.body,
             onLinkTap: (url, context, attributes, element) {
-              print(url);
+              if (url != null) {
+                launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+              }
             },
             onImageTap: (url, context, attributes, element) {
               print(url);

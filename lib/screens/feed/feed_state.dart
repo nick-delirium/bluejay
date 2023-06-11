@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bluejay/reddit.dart';
 import 'package:bluejay/types/reddit_post.dart';
+import 'package:bluejay/reddit_library/reddit.dart';
 
 class FeedState extends ChangeNotifier {
   List<Post> data = [];
@@ -27,6 +28,15 @@ class FeedState extends ChangeNotifier {
 
   void setLoading(bool loading) {
     isLoading = loading;
+    notifyListeners();
+  }
+
+  Future<void> vote(Post post, VoteDir dir) async {
+    var result = await post.vote(dir);
+    if (result == true) {
+      var changeIndex = data.indexWhere((element) => element.id == post.id);
+      data[changeIndex] = post;
+    }
     notifyListeners();
   }
 }

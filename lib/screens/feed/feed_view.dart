@@ -45,6 +45,7 @@ class RedditFeedWidgetState extends State<RedditFeedWidget> {
                   child: RedditPostView(
                     post: post,
                     isExpanded: false,
+                    vote: feedState.vote,
                   ),
                 );
               }),

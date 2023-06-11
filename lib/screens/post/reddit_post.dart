@@ -8,10 +8,12 @@ import 'components/post_body.dart';
 import 'components/comments.dart';
 
 class RedditPostView extends StatefulWidget {
-  const RedditPostView({super.key, required this.isExpanded, this.post});
+  const RedditPostView(
+      {super.key, required this.isExpanded, this.post, required this.vote});
 
   final Post? post;
   final bool isExpanded;
+  final Function vote;
 
   @override
   State<RedditPostView> createState() => _RedditPostViewState();
@@ -39,10 +41,16 @@ class _RedditPostViewState extends State<RedditPostView> {
 
     if (widget.isExpanded) {
       return ExpandedPost(
-          theme: theme, usedPost: usedPost, upvoteRatio: upvoteRatio);
+          theme: theme,
+          usedPost: usedPost,
+          upvoteRatio: upvoteRatio,
+          vote: postState.vote);
     } else {
       return FeedPost(
-          theme: theme, usedPost: usedPost, upvoteRatio: upvoteRatio);
+          theme: theme,
+          usedPost: usedPost,
+          upvoteRatio: upvoteRatio,
+          vote: (voteDir) => widget.vote(usedPost, voteDir));
     }
   }
 }
@@ -53,11 +61,13 @@ class FeedPost extends StatelessWidget {
     required this.theme,
     required this.usedPost,
     required this.upvoteRatio,
+    required this.vote,
   });
 
   final ThemeData theme;
   final Post usedPost;
   final String upvoteRatio;
+  final Function vote;
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +107,8 @@ class FeedPost extends StatelessWidget {
             postUrl: usedPost.permalink,
             mediaUrl: usedPost.url,
             commentsAmount: usedPost.commentsAmount,
+            vote: vote,
+            upvoteDir: usedPost.upvoteDir,
           ),
         ],
       )),
@@ -110,11 +122,13 @@ class ExpandedPost extends StatelessWidget {
     required this.theme,
     required this.usedPost,
     required this.upvoteRatio,
+    required this.vote,
   });
 
   final ThemeData theme;
   final Post usedPost;
   final String upvoteRatio;
+  final Function vote;
 
   @override
   Widget build(BuildContext context) {
@@ -159,6 +173,8 @@ class ExpandedPost extends StatelessWidget {
                 postUrl: usedPost.permalink,
                 mediaUrl: usedPost.url,
                 commentsAmount: usedPost.commentsAmount,
+                vote: vote,
+                upvoteDir: usedPost.upvoteDir,
               ),
               Comments(),
             ],

@@ -1,4 +1,5 @@
 import 'package:bluejay/utils/strings.dart';
+import 'package:bluejay/reddit_library/reddit.dart';
 
 enum FlairTypes { richtext, text, unmapped }
 
@@ -46,6 +47,8 @@ class PostImage {
 }
 
 class Post {
+  Reddit api;
+  VoteDir upvoteDir;
   String id;
   String subreddit;
   String subredditShort;
@@ -56,6 +59,7 @@ class Post {
   double upvoteRatio;
   bool clicked;
   bool over18;
+  String name;
   bool hideScore;
   bool spoiler;
   int createdAt;
@@ -79,6 +83,8 @@ class Post {
   int? commentsAmount;
 
   Post({
+    required this.upvoteDir,
+    required this.api,
     required this.commentsAmount,
     required this.permalink,
     required this.id,
@@ -100,13 +106,14 @@ class Post {
     required this.clicked,
     required this.images,
     required this.isGallery,
+    required this.name,
     this.selftext,
     this.linkFlairText,
     this.linkFlairBackgroundColor,
     this.thumbnail,
   });
 
-  factory Post.fromJson(Map<String, dynamic> json) {
+  factory Post.fromJson(Map<String, dynamic> json, Reddit api) {
     String? selfText;
     String? selfHtml = json['selftext_html'];
 
@@ -153,11 +160,15 @@ class Post {
         }
       }
     }
+
     return Post(
+      api: api,
       commentsAmount: json['num_comments'],
       id: json['id'],
+      name: json['name'],
       subreddit: json['subreddit_name_prefixed'],
       isGallery: isGallery,
+      upvoteDir: voteState(json['likes']),
 
       /// without r/
       subredditShort: json['subreddit'],
@@ -188,8 +199,27 @@ class Post {
       createdAt: json['created_utc'].toInt(),
     );
   }
+
+  Future<bool> vote(VoteDir dir) async {
+    var result = await api.vote(name, dir);
+    if (result == true) {
+      upvoteDir = dir;
+    }
+    return result;
+  }
 }
 
+VoteDir voteState(dynamic likes) {
+  switch (likes) {
+    case true:
+      return VoteDir.up;
+    case false:
+      return VoteDir.down;
+    case null:
+    default:
+      return VoteDir.neutral;
+  }
+}
 /// useful info keys for future?
 /// selftext big dump of text with md format
 /// selftext_html same but html ig

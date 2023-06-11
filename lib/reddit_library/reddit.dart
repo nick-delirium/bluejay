@@ -35,6 +35,19 @@ class Reddit {
   Multireddit multi(String user, String multiName) =>
       Multireddit(this, user, multiName);
 
+  Future<bool> vote(String id, VoteDir dir) async {
+    if (!_oauthEnabled) return false;
+    Uri uri = baseApiUri().replace(
+        path: 'api/vote',
+        queryParameters: {"dir": "${getVoteDir(dir)}", "id": id});
+    print("$id, $dir, $uri");
+    var headers = {
+      'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'Accept': 'application/x-www-form-urlencoded;charset=UTF-8'
+    };
+    var result = await client.post(uri, headers: headers);
+    return result.statusCode == 200;
+  }
   /* BROWSE SUBREDDITS */
 
   /// Allowed filters are all Listing filters.
@@ -150,5 +163,19 @@ class Reddit {
     client = oauth2.Client(credentials, identifier: identifier);
     _oauthEnabled = true;
     return this;
+  }
+}
+
+enum VoteDir { down, neutral, up }
+
+int getVoteDir(VoteDir dir) {
+  switch (dir) {
+    case VoteDir.down:
+      return -1;
+    case VoteDir.up:
+      return 1;
+    case VoteDir.neutral:
+    default:
+      return 0;
   }
 }
