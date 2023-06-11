@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bluejay/types/reddit_post.dart';
+import 'package:bluejay/reddit_library/reddit.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   group('Post', () {
@@ -30,7 +32,7 @@ void main() {
         'selftext_html': '',
         'link_flair_text': 'Flair',
         'link_flair_background_color': '#FF0000',
-      });
+      }, Reddit(http.Client()));
     });
 
     test('fromJson() should create a valid Post object', () {

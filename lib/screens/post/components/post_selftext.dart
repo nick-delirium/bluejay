@@ -1,5 +1,6 @@
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PostSelfText extends StatelessWidget {
   const PostSelfText({
@@ -18,7 +19,9 @@ class PostSelfText extends StatelessWidget {
     return Html(
       data: safeText,
       onLinkTap: (url, context, attributes, element) {
-        print(url);
+        if (url != null) {
+          launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+        }
       },
       onImageTap: (url, context, attributes, element) {
         print(url);

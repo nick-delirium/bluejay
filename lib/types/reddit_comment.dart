@@ -1,5 +1,6 @@
 import 'reddit_post.dart';
 import 'package:bluejay/utils/strings.dart';
+import 'package:bluejay/reddit_library/reddit.dart';
 
 class Comment extends Post {
   List<Comment> replies = [];
@@ -11,7 +12,6 @@ class Comment extends Post {
   String? authorFullname;
 
   /// t1_id
-  String name;
   String body;
   int depth;
 
@@ -20,7 +20,7 @@ class Comment extends Post {
     required this.bannedAtUtc,
     required this.parentId,
     required this.body,
-    required this.name,
+    required name,
     required this.depth,
     required id,
     required subreddit,
@@ -37,14 +37,19 @@ class Comment extends Post {
     required postType,
     required linkFlairType,
     required permalink,
+    required Reddit api,
     this.authorFullname,
     this.hiddenReplies,
+    required VoteDir upvoteDir,
     title,
     clicked,
     selftext,
     linkFlairText,
     linkFlairBackgroundColor,
   }) : super(
+          name: name,
+          upvoteDir: upvoteDir,
+          api: api,
           isGallery: false,
           commentsAmount: 0,
           permalink: permalink,
@@ -70,7 +75,7 @@ class Comment extends Post {
           linkFlairText: linkFlairText,
         );
 
-  factory Comment.fromJson(Map<String, dynamic> json) {
+  factory Comment.fromJson(Map<String, dynamic> json, Reddit api) {
     String? selfText;
     String body;
     String? bodyHtml = json['body_html'];
@@ -102,7 +107,7 @@ class Comment extends Post {
         /// id "t3___" (yeah, without actual id).
         /// goot job reddit api devs?
         if (subComment['data']['body'] != null) {
-          Comment reply = Comment.fromJson(subComment['data']);
+          Comment reply = Comment.fromJson(subComment['data'], api);
           replies.add(reply);
         }
       }
@@ -113,7 +118,9 @@ class Comment extends Post {
     String? safeFlairText =
         json['link_flair_text']?.replaceAll(RegExp(r':snoo_([^:]+):'), '');
     return Comment(
+      api: api,
       body: body,
+      upvoteDir: voteState(json['likes']),
       permalink: json['permalink'],
       replies: replies,
       hiddenReplies: hiddenReplies,

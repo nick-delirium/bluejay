@@ -68,7 +68,7 @@ final _router = GoRouter(routes: [
   GoRoute(
       path: '/login',
       builder: (context, state) => MainLayout(
-            startViewIndex: 3,
+            startViewIndex: 2,
           )),
   GoRoute(path: '/post', builder: (context, state) => PostLayout())
 ]);
@@ -87,6 +87,7 @@ class PostLayout extends StatelessWidget {
           ),
           elevation: 2),
       body: RedditPostView(
+        vote: postState.currentPost!.vote,
         isExpanded: true,
       ),
     ));

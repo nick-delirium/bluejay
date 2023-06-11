@@ -1,8 +1,8 @@
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:bluejay/types/reddit_post.dart';
+import 'package:bluejay/reddit_library/reddit.dart';
+import 'package:bluejay/components/rating.dart';
 
 class PostBottom extends StatelessWidget {
   const PostBottom({
@@ -13,6 +13,8 @@ class PostBottom extends StatelessWidget {
     required this.postType,
     required this.postUrl,
     required this.mediaUrl,
+    required this.vote,
+    required this.upvoteDir,
     this.commentsAmount,
   });
 
@@ -23,11 +25,12 @@ class PostBottom extends StatelessWidget {
   final String postUrl;
   final String mediaUrl;
   final int? commentsAmount;
+  final Function vote;
+  final VoteDir upvoteDir;
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    var formatter = NumberFormat.compact();
 
     bool isWithMedia = "https://www.reddit.com$postUrl" != mediaUrl;
     return Container(
@@ -96,31 +99,13 @@ class PostBottom extends StatelessWidget {
               ),
             ),
           if (isExpanded) Text(upvoteRatio, style: TextStyle(fontSize: 14)),
-          IconButton(
-            icon: Icon(
-              Icons.arrow_drop_down,
-              semanticLabel: 'Downvote',
-            ),
-            padding: EdgeInsets.all(0),
-            iconSize: 28,
-            onPressed: () {
-              print('down');
-              HapticFeedback.vibrate();
-            },
-          ),
-          Text(formatter.format(score)),
-          IconButton(
-            icon: Icon(
-              Icons.arrow_drop_up,
-              semanticLabel: 'Upvote',
-            ),
-            padding: EdgeInsets.all(0),
-            iconSize: 28,
-            onPressed: () {
-              print('up');
-              HapticFeedback.lightImpact();
-            },
-          ),
+          Rating(
+              voteDir: upvoteDir,
+              onUp: () =>
+                  vote(upvoteDir == VoteDir.up ? VoteDir.neutral : VoteDir.up),
+              onDown: () => vote(
+                  upvoteDir == VoteDir.down ? VoteDir.neutral : VoteDir.down),
+              score: score)
         ],
       ),
     );

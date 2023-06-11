@@ -40,7 +40,7 @@ class RedditAPI {
         .filter("count", seen)
         .fetch();
     for (var post in result['data']['children']) {
-      posts.add(Post.fromJson(post['data']));
+      posts.add(Post.fromJson(post['data'], _reddit));
     }
     return posts;
   }
@@ -73,7 +73,7 @@ class RedditAPI {
   List<Post> mapPosts(json) {
     List<Post> posts = [];
     for (var post in json['data']['children']) {
-      posts.add(Post.fromJson(post['data']));
+      posts.add(Post.fromJson(post['data'], _reddit));
     }
     return posts;
   }
@@ -91,7 +91,7 @@ class RedditAPI {
       for (var comment in commentList['data']['children']) {
         if (comment['kind'] == 't1') {
           var rawComment = comment['data'];
-          comments.add(Comment.fromJson(rawComment));
+          comments.add(Comment.fromJson(rawComment, _reddit));
         }
       }
     }
@@ -106,7 +106,6 @@ class RedditAPI {
     }
     var prefs = await SharedPreferences.getInstance();
     String? creds = prefs.getString('oauth_credentials');
-    print('credentials: $creds');
     if (creds != null) {
       oauth2.Credentials? credentials = oauth2.Credentials.fromJson(creds);
       print('reddit credentials saved');
@@ -116,6 +115,7 @@ class RedditAPI {
       }
       _reddit = _reddit.relogin(credentials, apiKey);
       isAuth = true;
+      return true;
     }
     print('not__authorized');
     return false;
